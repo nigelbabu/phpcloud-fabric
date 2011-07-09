@@ -1,0 +1,164 @@
+% The Flask thing at UDS
+\documentclass[xcolor=dvipsnames]{beamer}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{verbatim}
+\def\us{\char`\_}
+\usetheme{CambridgeUS}
+
+\title{Deploying with Fabric}
+\author{Nigel}
+\date[phpcloud]{Scaling PHP in the cloud}
+
+\begin{document}
+
+    \begin{frame}
+        \titlepage
+    \end{frame}
+
+    \begin{frame}{What the heck is Fabric?}
+        \begin{itemize}
+            \pause \item Well, for starters, its written in python.  \pause Yes, I'm talking about Python in a PHP conference.
+            \pause \item Its a library and a command-line tool.
+            \pause \item It streamlines the use of SSH for application deployment or systems administration tasks.
+            \pause \item That doesn't mean you have to use it only for SSH related tasks.
+            \pause \item You know those boring and repetitive tasks you have to do for every deployment?  Writing it in fabric removes the monotony, it'll be one step!
+            \pause \item Fabric can execute local or remote commands and upload/download files and much much more!
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Ok, so how do I use Fabric?}
+        \begin{center}
+        \pause Write a file called fabfile.py, write your commands in it, and place it in the root of your project.  Then execute individual commands with "fab foo".
+        \end{center}
+    \end{frame}
+    
+    \begin{frame}{This is what a fabfile.py looks like}
+        \begin{verbatim}
+
+            from fabric.api import run \\
+
+            def host\us type():\\
+            \hspace{20 pt}run('uname -s')\\
+            
+        \end{verbatim}
+
+    \end{frame}
+
+
+    \begin{frame}{What happens when you run it}
+        \begin{verbatim}
+
+            \$ fab -H localhost,linuxbox host\us type \\
+            $[$localhost$]$ run: uname -s \\
+            $[$localhost$]$ out: Darwin \\
+            $[$linuxbox$]$ run: uname -s \\
+            $[$linuxbox$]$ out: Linux \\
+
+            Done. \\
+            Disconnecting from localhost... done. \\
+            Disconnecting from linuxbox... done. \\
+            
+        \end{verbatim}
+
+    \end{frame}
+
+    \begin{frame}{What makes Fabric unique?}
+        \begin{center}
+        \pause There are other deployment tools out there, what makes Fabric unique?  Fabric gives you a basic API on which YOU build the methods for YOUR workflow.
+        \end{center}
+    \end{frame}
+
+    \begin{frame}{Lets look at the API further}
+        \begin{center}
+        \pause There's no point in me saying Fabric is the next best thing since sliced bread without showing off its API.
+        \end{center}
+    \end{frame}
+
+    \begin{frame}{Local commands}
+        \begin{center}
+        \pause There's no point in me saying Fabric is the next best thing since sliced bread without showing off its API.
+        \end{center}
+    \end{frame}
+    
+    \begin{frame}{Local commands}
+        \begin{verbatim}
+            from fabric.api import local\\
+
+            def prepare\us deploy():\\
+            \hspace{20 pt}local("bin/run tests")\\
+            \hspace{20 pt}local("git add . \&\& git commit")
+            
+        \end{verbatim}
+
+    \end{frame}  
+
+    \begin{frame}{Lets go remote}
+        \begin{verbatim}
+
+            from \us\us future\us\us import with\us statement \\
+            from fabric.api import local, settings, abort, run, cd \\
+            from fabric.contrib.console import confirm \\
+
+            def deploy(): \\
+            \hspace{15 pt}code\us dir = '/var/www/myproject' \\
+            \hspace{15 pt}with settings(warn\us only=True): \\
+            \hspace{15 pt}\hspace{15 pt}if run("test -d \%s" \% code\us dir).failed: \\
+            \hspace{15 pt}\hspace{15 pt}\hspace{15 pt}run("git clone user@github.com/user/repo" \% code\us dir) \\
+            \hspace{15 pt}with cd(code\us dir): \\
+            \hspace{15 pt}\hspace{15 pt}run("git pull") \\
+            
+        \end{verbatim}
+    \end{frame}
+
+    \begin{frame}{What happens when you run it}
+        \begin{verbatim}
+    
+            \$ fab deploy \\
+            No hosts found. Please specify (single) host \\string for connection: myserver \\
+            $[$myserver$]$ run: git pull \\
+            $[$myserver$]$ out: Already up-to-date. \\
+            $[$myserver$]$ out: \\
+            $[$myserver$]$ run: touch app.wsgi \\
+
+            Done. \\
+
+        \end{verbatim}
+    \end{frame}
+
+    \begin{frame}{Use the env}
+        \begin{verbatim}
+    
+            env.hosts = ['my\us server']
+
+        \end{verbatim}
+    \end{frame}    
+
+    \begin{frame}{Disadvantage}
+        \begin{itemize}
+            \pause \item Not parallel.  If you have to execute tasks on 5 machines, Fabric does it one by one.  \pause However, there is a fork of Fabric that can execute tasks parallely on multiple hosts.
+            \pause \item Everything needs to be defined manually.  Yeah, this is the power as well as sometimes the curse.  For certain situations, its just easier to use tools like capistrano.
+        \end{itemize}
+    \end{frame}    
+
+    \begin{frame}{Workflow Discussions}
+        \begin{center}
+        \pause How do you deploy your sites to production?
+        \end{center}
+    \end{frame}  
+
+    \begin{frame}{More information}
+        \begin{itemize}
+        \item Fabric Website, http://fabfile.org
+        \item \LaTeX Source for my slides, https://github.com/nigelbabu/phpcloud-fabric
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Q and A}
+        \begin{center}
+        \pause Ask your questions, give your feedback. \\
+        \pause \small Complains redirected to /dev/null.
+        \end{center}
+    \end{frame}  
+
+\end{document}
